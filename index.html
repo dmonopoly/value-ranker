@@ -54,13 +54,13 @@
                 <p class="text-gray-500">Drag values to the spectrum. Drop items next to each other to rank them equally. Items left in the lot will be unranked.</p>
             </header>
 
-            <main class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Left Side: Ranking Spectrum -->
                 <div class="flex flex-col">
                     <div class="text-center px-2 mb-2">
                         <span class="font-bold text-green-600">More Valued</span>
                     </div>
-                    <div id="ranking-list-container" class="items-center relative h-[500px] w-full bg-white rounded-xl shadow-inner p-3 space-y-2 overflow-y-auto">
+                    <div id="ranking-list-container" class="relative h-[500px] w-full bg-white rounded-xl shadow-inner p-3 space-y-2 overflow-y-auto">
                         <!-- Ranking Tiers will be dynamically added here -->
                     </div>
                     <div class="text-center px-2 mt-2">
@@ -71,7 +71,7 @@
                 <!-- Right Side: Parking Lot -->
                 <div class="flex flex-col">
                     <h2 class="font-bold text-center text-gray-600 mb-2">Parking Lot</h2>
-                    <div id="parking-lot-list" class="bg-gray-200 rounded-xl shadow-inner p-3 space-y-2 h-[500px] overflow-y-auto">
+                    <div id="parking-lot-list" class="bg-gray-200 rounded-xl shadow-inner p-3 space-y-2 h-[552px] overflow-y-auto">
                         <!-- Initial unranked items -->
                     </div>
                     <div class="mt-4 flex gap-2">
@@ -100,7 +100,7 @@
 
     <script>
         const initialValues = [
-            "God", "Honesty", "Trust", "Peace", "Family", "Friends", "Health", "Recreation", "Career"
+            "God, Faith, Connection with God", "Peace", "Sports", "Friends", "Gaming", "Creativity", "Reading", "Trust", "Mental health", "Physical health", "Pursuit of excellence", "Intentional living - planning toward goals", "Challenging yourself", "Sacrifice to succeed", "Spouse", "Parents", "Siblings"
         ];
 
         // DOM Elements
