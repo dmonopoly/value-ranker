@@ -15,12 +15,10 @@ import RankingBoard from '@/components/RankingBoard';
 import ValueItem from '@/components/ValueItem';
 import TierDragOverlay from '@/components/TierDragOverlay';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
-import { SavedRankingFormat } from '@/lib/SavedRankingFormat';
 import { TEMPLATES, TemplateKey } from '@/lib/ItemTemplates';
-import { ObjectId } from "mongodb";
 import Ranking from "@/models/Ranking";
 
-// Internal state structure for quick JS manipulations before writing to SavedRankingFormat
+// Internal state structure for quick JS manipulations before writing to models/Ranking.
 type ItemsState = {
     // Stores key "parking-lot" for unranked items and "tier-<id>" for ranked tiers
     // where <id> is a unique number

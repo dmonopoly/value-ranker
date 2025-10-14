@@ -1,8 +1,8 @@
-// src/app/api/rankings/route.ts
 import { NextResponse } from 'next/server';
 import clientPromise from '@/services/mongodb';
 
 export async function POST(request: Request) {
+  console.log("POST /api/rankings called");
   try {
     const client = await clientPromise;
     const db = client.db(process.env.MONGO_DATABASE);
