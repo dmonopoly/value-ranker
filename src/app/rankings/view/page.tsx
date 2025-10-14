@@ -50,7 +50,7 @@ const RankingDisplay = ({ title, ranking }: { title: string, ranking: SavedRanki
 
 const SummaryPage: React.FC = () => {
     const router = useRouter();
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
     const [ranking1, setRanking1] = useState<SavedRankingFormat | null>(null);
     const [ranking2, setRanking2] = useState<SavedRankingFormat | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -92,24 +92,28 @@ const SummaryPage: React.FC = () => {
         let friendRankingId: string;
         try {
             // Create other entry that friend will fill out.
-            let response = await fetch('https://jsonblob.com/api/jsonBlob', {
+            let response = await fetch('/api/rankings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({}),
             });
             if (!response.ok) throw new Error("Failed to save ranking data.");
-            const blobUrl = response.headers.get('location');
-            if (!blobUrl) throw new Error("Could not get blob URL from response.");
-            friendRankingId = blobUrl.substring(blobUrl.lastIndexOf('/') + 1);
 
-            // Update our JSON Blob entry.
+            // Extract the new ID from the server's response.
+            const { friendRankingId } = await response.json();
+            if (!friendRankingId) {
+                throw new Error("API did not return an insertedId.");
+            }
+
             ranking1.otherBlobIds = [...(ranking1.otherBlobIds ?? []), friendRankingId];
             setRanking1(ranking1);
-            response = await fetch('https://jsonblob.com/api/jsonBlob/' + id1, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(ranking1),
-                });
+
+            // Update our own entry to include the new friend id.
+            response = await fetch(`/api/rankings/${id1}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ranking1),
+            });
         } catch (error) {
             console.error(`Failed to prepare new ranking for friend:`, error);
             return null;

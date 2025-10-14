@@ -65,16 +65,21 @@ const RankingPage: React.FC = () => {
 
     useEffect(() => {
         // Tracks if component is still mounted to avoid race conditions. Wrap around async result
-        // usages only; basically this checks if we should use that promise or if it's out of date.
-        let current = true;
+        // usages only; this checks if we should use that promise or if it's out of date.
+        let isComponentMounted = true;
         const loadRankingForEdit = async (id: string) => {
             setIsLoading(true);
 
             try {
-                const data = await collections.rankings?.findOne({ _id: new ObjectId(id) }) as Ranking;
+                const response = await fetch(`/api/rankings/${id}`);
+                if (!response.ok) {
+                    throw new Error(`Ranking data not found for id: ${id}. Status: ${response.status}`);
+                }
+                const data: Ranking = await response.json();
+
                 if (data === null) throw new Error("Ranking data not found.");
                 
-                if (current) {  // Update state only if current
+                if (isComponentMounted) {
                     // Reconstruct the internal state ItemsState from the stored format
                     const newTierOrder: string[] = [];
                     const newContainers: { [key: string]: string[] } = {};
@@ -89,13 +94,12 @@ const RankingPage: React.FC = () => {
                         ...data });
                 }
             } catch (error) {
-                if (current) {
+                if (isComponentMounted) {
                     console.error("Failed to load ranking for editing:", error);
                     router.push('/new')
-                    // navigate('/new');
                 }
             } finally {
-                if (current)
+                if (isComponentMounted)
                     setIsLoading(false);
             }
         };
@@ -103,10 +107,14 @@ const RankingPage: React.FC = () => {
         const loadValuesFromOriginFriend = async (id: string) => {
             setIsLoading(true);
             try {
-                const data = await collections.rankings?.findOne({ _id: new ObjectId(id) }) as Ranking;
+                const response = await fetch(`/api/rankings/${id}`);
+                if (!response.ok) {
+                    throw new Error(`Friend's ranking data not found for id: ${id}. Status: ${response.status}`);
+                }
+                const data: Ranking = await response.json();
                 if (data === null) throw new Error("Friend's ranking data not found.");
                 
-                if (current) {
+                if (isComponentMounted) {
                     // Use the friend's ranked items as the initial unranked items
                     const allItems = data.rankedTiers.flat().concat(data.unrankedItems || []);
                     setItems({
@@ -118,13 +126,12 @@ const RankingPage: React.FC = () => {
                     });
                 }
             } catch (error) {
-                if (current) {
+                if (isComponentMounted) {
                     console.error("Failed to load friend's items:", error);
                     router.push('/new')
-                    // navigate('/new');
                 }
             } finally {
-                if (current)
+                if (isComponentMounted)
                     setIsLoading(false);
             }
         };
@@ -138,7 +145,7 @@ const RankingPage: React.FC = () => {
             setIsLoading(false);
         }
     
-        return () => { current = false; }; // Cleanup function to set current to false on unmount
+        return () => { isComponentMounted = false; }; // Cleanup function to indicate we have unmounted
     }, [editRankingId, originRankingId, router]);
     
     const addNewValue = (value: string) => {
@@ -353,55 +360,65 @@ const RankingPage: React.FC = () => {
             const rankedTiersAsArray = items.tierOrder.map(tierId => items.containers[tierId]);
             const unrankedItems = items.containers['parking-lot'] || [];
 
+            const dataToSave = {
+                rankedTiers: rankedTiersAsArray,
+                unrankedItems,
+                otherBlobIds: items.otherBlobIds || [], // Ensure this is initialized
+            };
+
             let response: Response;
             if (editRankingId) {
                 // Editing an existing ranking.
-                console.log('handleFinishRanking: items:', items);
-                const dataToSave: Ranking = { 
-                    rankedTiers: rankedTiersAsArray,
-                    unrankedItems,
-                    otherBlobIds: items.otherBlobIds,
-                };
-                const result = await collections.rankings?.updateOne({_id: new ObjectId(editRankingId)}, { $set: dataToSave });
-                if (!result) throw new Error("Original ranking creator failed to update data.");
-                // navigate(`/view?id1=${editRankingId}`);
+                console.log('Editing ranking with items: ', items);
+                response = await fetch(`/api/rankings/${editRankingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update ranking. Status: ${response.status}`);
+                }
+
                 router.push(`/view?id1=${editRankingId}`);
             } else {
-                const dataToSave: SavedRankingFormat = { 
-                    rankedTiers: rankedTiersAsArray,
-                    unrankedItems,
-                    otherBlobIds: originRankingId ? [originRankingId] : []
-                };
                 if (originRankingId && targetRankingId) {
-                    // TODO
                     // We're a friend updating a target ranking ID that was already created for us.
-                    const result = await collections.rankings?.updateOne({_id: new ObjectId(targetRankingId)}, { $set: dataToSave });
-                    // response = await fetch('https://jsonblob.com/api/jsonBlob/' + targetRankingId, {
-                    //     method: 'PUT',
-                    //     headers: { 'Content-Type': 'application/json' },
-                    //     body: JSON.stringify(dataToSave),
-                    // });
+                    console.log(`Invited friend is submitting to target: ${targetRankingId}`);
 
-                    if (!result) throw new Error("Shared-to friend failed to update data.");
-                    // navigate(`/view?id1=${targetRankingId}&id2=${originRankingId}`);
+                    // The friend's ranking should link back to the person who invited them.
+                    dataToSave.otherBlobIds = [originRankingId];
+
+                    response = await fetch(`/api/rankings/${targetRankingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dataToSave),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Friend failed to update ranking. Status: ${response.status}`);
+                    }
+
                     router.push(`/view?id1=${targetRankingId}&id2=${originRankingId}`);
                 } else {
                     // Creating a new ranking.
-                    response = await fetch('/api/rankings/create', {
+                    response = await fetch('/api/rankings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(dataToSave),
                     });
 
-                    if (!response.ok) throw new Error("Failed to save ranking data.");
+                    if (!response.ok) {
+                        throw new Error(`Failed to create new ranking. Status: ${response.status}`);
+                    }
 
-                    // const blobUrl = response.headers.get('location');
-                    // if (!blobUrl) throw new Error("Could not get blob URL from response.");
-                    // const newRankingId = blobUrl.substring(blobUrl.lastIndexOf('/') + 1);
+                    // Extract the new ID from the server's response.
+                    const { insertedId } = await response.json();
+                    if (!insertedId) {
+                        throw new Error("API did not return an insertedId.");
+                    }
 
-                    const newRankingId = result.insertedId.toString();
-                    // navigate(`/view?id1=${newRankingId}`);
-                    router.push(`/view?id1=${newRankingId}`);
+                    router.push(`/view?id1=${insertedId}`);
                 }
             } 
         } catch (error) {
