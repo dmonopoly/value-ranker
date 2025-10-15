@@ -11,10 +11,10 @@ const Header: React.FC = () => {
     };
 
     return (
-        <nav className="bg-gray-100 border-b-2 border-gray-300">
+        <nav className="border-b-2 border-gray-300">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src="/public/logo.svg" className="h-8" alt="Logo" />
+                    <img src="/logo.svg" className="h-8" alt="Logo" />
                     <div className="self-center text-2xl font-semibold whitespace-nowrap">
                         What Do You Value?
                     </div>
@@ -33,7 +33,7 @@ const Header: React.FC = () => {
                     </button>
                 </div>
                 <div className={`${isMenuOpen ? 'block' : 'hidden'} w-full md:block md:w-auto`} id="navbar-default">
-                    <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-100 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-100">
+                    <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
                         <li>
                             <Link href="/" className="text-lg text-blue-600 hover:underline flex-shrink-0">
                                 Home

@@ -2,7 +2,7 @@ import React from 'react';
 
 const AboutPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+        <div className="min-h-screen flex flex-col items-center">
             <main className="flex-grow w-full max-w-5xl p-2">
                 <section className="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <h2 className="text-2xl font-bold mb-4 text-center">

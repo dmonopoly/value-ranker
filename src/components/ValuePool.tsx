@@ -75,7 +75,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ items, pageType, onAddNewValue, o
             <SortableContext items={items} strategy={rectSortingStrategy}>
                 <div 
                     ref={setNodeRef}
-                    className="bg-gray-200 rounded-xl shadow-inner p-3 flex flex-wrap gap-2 min-h-[100px] overflow-y-auto content-start"
+                    className="bg-gray-100 rounded-xl shadow-inner p-3 flex flex-wrap gap-2 min-h-[100px] overflow-y-auto content-start"
                 >
                     {items.length === 0 && <div className="text-gray-500 pt-2 pl-2 pr-2 pb-2">No items to rank yet</div>}
                     {items.map(item =>

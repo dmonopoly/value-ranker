@@ -41,7 +41,7 @@ const RankingTier: React.FC<RankingTierProps> = ({ id, items, rank }) => {
             <SortableContext items={items} strategy={rectSortingStrategy}>
                 <div
                     ref={setDroppableNodeRef}
-                    className="ranking-tier w-full flex flex-wrap gap-2 p-2 border-2 border-dashed rounded-lg min-h-[52px]"
+                    className="ranking-tier w-full flex flex-wrap gap-2 p-2 border-2 border-dashed border-gray-200 rounded-lg min-h-[52px]"
                 >
                     {items.map(item => <ValueItem key={item} id={item} />)}
                     {items.length === 0 && <span className="text-gray-400 text-sm">Drop here</span>}
