@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
-import { SavedRankingFormat } from '@/lib/SavedRankingFormat';
+import Ranking from '@/models/Ranking';
+import randomstring from 'randomstring';
+import { ObjectId } from 'mongodb';
 
-const RankingDisplay = ({ title, ranking }: { title: string, ranking: SavedRankingFormat | null }) => {
+const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | null }) => {
     if (!ranking) return <div>Loading {title}...</div>;
 
     const { rankedTiers, unrankedItems } = ranking;
@@ -61,7 +63,7 @@ const SummaryPage: React.FC = () => {
     const id2 = searchParams.get('id2');
 
     useEffect(() => {
-        const fetchRanking = async (id: string | null): Promise<SavedRankingFormat | null> => {
+        const fetchRanking = async (id: string | null): Promise<Ranking | null> => {
             if (!id) return null;
             try {
                 const response = await fetch(`/api/rankings/${id}`);
@@ -92,11 +94,17 @@ const SummaryPage: React.FC = () => {
         let friendRankingId: string;
         try {
             // Create other entry that friend will fill out.
-            friendRankingId = crypto.randomUUID();
+            friendRankingId = randomstring.generate({
+                // ObjectId must conform to 24-character hex string, or int.
+                // https://www.mongodb.com/docs/manual/reference/method/ObjectId/
+                length: 24,
+                charset: 'hex'
+            });
             let response = await fetch('/api/rankings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    // "_id": new ObjectId(friendRankingId),
                     "_id": friendRankingId,
                 }),
             });
