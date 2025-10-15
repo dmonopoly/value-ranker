@@ -51,8 +51,8 @@ const RankingDisplay = ({ title, ranking }: { title: string, ranking: SavedRanki
 const SummaryPage: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [ranking1, setRanking1] = useState<SavedRankingFormat | null>(null);
-    const [ranking2, setRanking2] = useState<SavedRankingFormat | null>(null);
+    const [ranking1, setRanking1] = useState<Ranking | null>(null);
+    const [ranking2, setRanking2] = useState<Ranking | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showPopup, setShowPopup] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
@@ -64,7 +64,7 @@ const SummaryPage: React.FC = () => {
         const fetchRanking = async (id: string | null): Promise<SavedRankingFormat | null> => {
             if (!id) return null;
             try {
-                const response = await fetch(`https://jsonblob.com/api/jsonBlob/${id}`);
+                const response = await fetch(`/api/rankings/${id}`);
                 if (!response.ok) throw new Error("Ranking not found");
                 return await response.json();
             } catch (error) {
@@ -87,28 +87,25 @@ const SummaryPage: React.FC = () => {
     const handleQuizFriend = async () => {
         if (!id1) return;
 
-        // 0. Update our JSON Blob "db" entry to include a new friend id, which
-        // points to a JSON Blob that the shared-to friend will update.
+        // 0. Update our db entry to include a new friend id, which
+        // points to an entry that the shared-to friend will update.
         let friendRankingId: string;
         try {
             // Create other entry that friend will fill out.
+            friendRankingId = crypto.randomUUID();
             let response = await fetch('/api/rankings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
+                body: JSON.stringify({
+                    "_id": friendRankingId,
+                }),
             });
             if (!response.ok) throw new Error("Failed to save ranking data.");
 
-            // Extract the new ID from the server's response.
-            const { friendRankingId } = await response.json();
-            if (!friendRankingId) {
-                throw new Error("API did not return an insertedId.");
-            }
-
+            // Update our own entry to include the new friend id.
+            if (!ranking1) throw new Error("Current ranking data is missing.");
             ranking1.otherBlobIds = [...(ranking1.otherBlobIds ?? []), friendRankingId];
             setRanking1(ranking1);
-
-            // Update our own entry to include the new friend id.
             response = await fetch(`/api/rankings/${id1}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -121,7 +118,8 @@ const SummaryPage: React.FC = () => {
 
         // 1. Construct the quiz link using the current URL origin, the current ranking id as the friend id param,
         // and the friendRankingId.
-        const quizLink = `${window.location.origin}/new?${ORIGIN_ID_PARAM}=${id1}&${TARGET_ID_PARAM}=${friendRankingId}`;
+        if (!friendRankingId) throw new Error("friendRankingId is null");
+        const quizLink = `${window.location.origin}/rankings/new?${ORIGIN_ID_PARAM}=${id1}&${TARGET_ID_PARAM}=${friendRankingId}`;
         setShareableLink(quizLink);
 
         // 2. Copy the link to the clipboard
@@ -135,7 +133,7 @@ const SummaryPage: React.FC = () => {
     };
 
     const handleViewSharedResults = () => {
-        router.push(`/view?id1=${id1}&id2=${ranking1?.otherBlobIds?.[0]}`)
+        router.push(`/rankings/view?id1=${id1}&id2=${ranking1?.otherBlobIds?.[0]}`)
     };
     
     if (isLoading) {
@@ -168,7 +166,7 @@ const SummaryPage: React.FC = () => {
                     {!id2 && (
                         <>
                             <Link 
-                                href={`/edit?id=${id1}`}
+                                href={`/rankings/edit?id=${id1}`}
                                 className="text-gray-500 hover:text-gray-800 text-sm font-medium transition inline-block"
                             >
                                 Edit Your Ranking
@@ -191,7 +189,7 @@ const SummaryPage: React.FC = () => {
                     )}
                     {id2 && (
                          <Link 
-                            href={`/new`}
+                            href={`/rankings/new`}
                             className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-600 transition inline-block"
                         >
                             Create New Ranking

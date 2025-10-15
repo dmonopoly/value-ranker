@@ -94,7 +94,7 @@ const RankingPage: React.FC = () => {
             } catch (error) {
                 if (isComponentMounted) {
                     console.error("Failed to load ranking for editing:", error);
-                    router.push('/new')
+                    router.push('/rankings/new')
                 }
             } finally {
                 if (isComponentMounted)
@@ -126,7 +126,7 @@ const RankingPage: React.FC = () => {
             } catch (error) {
                 if (isComponentMounted) {
                     console.error("Failed to load friend's items:", error);
-                    router.push('/new')
+                    router.push('/rankings/new')
                 }
             } finally {
                 if (isComponentMounted)
@@ -378,7 +378,7 @@ const RankingPage: React.FC = () => {
                     throw new Error(`Failed to update ranking. Status: ${response.status}`);
                 }
 
-                router.push(`/view?id1=${editRankingId}`);
+                router.push(`/rankings/view?id1=${editRankingId}`);
             } else {
                 if (originRankingId && targetRankingId) {
                     // We're a friend updating a target ranking ID that was already created for us.
@@ -394,10 +394,12 @@ const RankingPage: React.FC = () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Friend failed to update ranking. Status: ${response.status}`);
+                        let errorMsg = 'Friend failed to update ranking';
+                        console.error(errorMsg, response);
+                        throw new Error(errorMsg);
                     }
 
-                    router.push(`/view?id1=${targetRankingId}&id2=${originRankingId}`);
+                    router.push(`/rankings/view?id1=${targetRankingId}&id2=${originRankingId}`);
                 } else {
                     // Creating a new ranking.
                     response = await fetch('/api/rankings', {
@@ -416,7 +418,7 @@ const RankingPage: React.FC = () => {
                         throw new Error("API did not return an insertedId.");
                     }
 
-                    router.push(`/view?id1=${insertedId}`);
+                    router.push(`/rankings/view?id1=${insertedId}`);
                 }
             } 
         } catch (error) {
