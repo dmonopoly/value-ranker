@@ -1,0 +1,1 @@
+export type ValuePoolPageType = 'create' | 'invited' | 'edit';
