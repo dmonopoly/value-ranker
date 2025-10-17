@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +15,7 @@ const Header: React.FC = () => {
         <nav className="border-b-2 border-gray-300">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src="/logo.svg" className="h-8" alt="Logo" />
+                    <Image src="/logo.svg" className="h-8" alt="Logo" width={32} height={32} />
                     <div className="self-center text-2xl font-semibold whitespace-nowrap">
                         What Do You Value?
                     </div>

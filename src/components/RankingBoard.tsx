@@ -28,7 +28,7 @@ const NewTierDropZone = () => {
 type RankingBoardProps = {
     tierOrder: string[];
     containers: { [key: string]: string[] };
-    activeDraggedId: string | null;
+    activeDraggedId?: string | null;
 };
 
 const RankingBoard: React.FC<RankingBoardProps> = ({ tierOrder, containers }) => {

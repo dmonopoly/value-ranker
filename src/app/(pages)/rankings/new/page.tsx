@@ -177,7 +177,7 @@ const RankingPage: React.FC = () => {
         }
     }
 
-    const handleChangeTemplate = (templateKey: TemplateKey) => {
+    const handleChangeTemplate = (templateKey: string) => {
         const hasRankedItems = items.tierOrder.length > 0;
 
         const currentParkingLot = items.containers['parking-lot'] || [];
@@ -198,12 +198,13 @@ const RankingPage: React.FC = () => {
             }
         }
         
-        setActiveTemplate(templateKey);
+        const template = templateKey as TemplateKey;
+        setActiveTemplate(template);
         setItems((prev) => ({
             ...prev,
             tierOrder: [],
             containers: {
-                'parking-lot': TEMPLATES[templateKey].sort(() => 0.5 - Math.random()),
+                'parking-lot': TEMPLATES[template].sort(() => 0.5 - Math.random()),
             },
         }));
     };
@@ -395,7 +396,7 @@ const RankingPage: React.FC = () => {
                     });
 
                     if (!response.ok) {
-                        let errorMsg = 'Friend failed to update ranking';
+                        const errorMsg = 'Friend failed to update ranking';
                         console.error(errorMsg, response);
                         throw new Error(errorMsg);
                     }

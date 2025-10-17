@@ -6,7 +6,6 @@ import Link from 'next/link';
 import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import Ranking from '@/models/Ranking';
-import randomstring from 'randomstring';
 
 const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | null }) => {
     if (!ranking) return <div>Loading {title}...</div>;
@@ -179,7 +178,7 @@ const SummaryPage: React.FC = () => {
                             >
                                 Ask Friend to Rank
                             </button>
-                            { ranking1.otherBlobIds?.length > 0 && (
+                            { (ranking1.otherBlobIds?.length ?? 0) > 0 && (
                                 <button 
                                     onClick={handleViewSharedResults}
                                     className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"

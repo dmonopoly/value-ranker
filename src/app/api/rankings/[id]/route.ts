@@ -6,11 +6,11 @@ import { ObjectId } from 'mongodb'; // Required to query by MongoDB's unique _id
  * Handles GET requests to fetch a single ranking by its ID.
  * Example URL: /api/rankings/60d21b4667d0d8992e610c85
  */
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
     try {
         const client = await clientPromise;
         const db = client.db(process.env.MONGO_DATABASE);
-        const { id } = await params;
 
         // Validate the incoming ID to ensure it's a valid MongoDB ObjectId.
         if (!ObjectId.isValid(id)) {
@@ -38,14 +38,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
  * Handles PUT requests to update an existing ranking by its ID.
  * Example URL: /api/rankings/60d21b4667d0d8992e610c85
  */
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
     try {
         console.log("Updating ranking 1");
         const client = await clientPromise;
         console.log("Updating ranking 2");
         const db = client.db(process.env.MONGO_DATABASE);
         console.log("Updating ranking 3");
-        const { id } = await params;
 
         console.log("Updating ranking with ID:", id);
 
