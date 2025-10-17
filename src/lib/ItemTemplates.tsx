@@ -45,6 +45,7 @@ export const TEMPLATES = {
     ],
     'funny_situations': [
         'Accidentally sending a text to the wrong person',
+        'Mooching off your parents even though you\'re an adult',
     ],
     'love_languages': [
         'Acts of Service',
