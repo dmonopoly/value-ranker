@@ -7,7 +7,6 @@ import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import Ranking from '@/models/Ranking';
 import randomstring from 'randomstring';
-import { ObjectId } from 'mongodb';
 
 const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | null }) => {
     if (!ranking) return <div>Loading {title}...</div>;
@@ -94,21 +93,16 @@ const SummaryPage: React.FC = () => {
         let friendRankingId: string;
         try {
             // Create other entry that friend will fill out.
-            friendRankingId = randomstring.generate({
-                // ObjectId must conform to 24-character hex string, or int.
-                // https://www.mongodb.com/docs/manual/reference/method/ObjectId/
-                length: 24,
-                charset: 'hex'
-            });
             let response = await fetch('/api/rankings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    // "_id": new ObjectId(friendRankingId),
-                    "_id": friendRankingId,
-                }),
+                body: JSON.stringify({}),
             });
             if (!response.ok) throw new Error("Failed to save ranking data.");
+
+            const responseData = await response.json();
+            friendRankingId = responseData.insertedId;
+
 
             // Update our own entry to include the new friend id.
             if (!ranking1) throw new Error("Current ranking data is missing.");

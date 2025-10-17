@@ -386,6 +386,7 @@ const RankingPage: React.FC = () => {
 
                     // The friend's ranking should link back to the person who invited them.
                     dataToSave.otherBlobIds = [originRankingId];
+                    console.log('dataToSave:', dataToSave);
 
                     response = await fetch(`/api/rankings/${targetRankingId}`, {
                         method: 'PUT',
