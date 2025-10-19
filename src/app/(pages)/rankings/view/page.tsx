@@ -6,6 +6,7 @@ import Link from 'next/link';
 import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import Ranking from '@/models/Ranking';
+import { Suspense } from 'react'
 
 const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | null }) => {
     if (!ranking) return <div>Loading {title}...</div>;
@@ -48,7 +49,7 @@ const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | 
     );
 };
 
-const SummaryPage: React.FC = () => {
+const SummaryView: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [ranking1, setRanking1] = useState<Ranking | null>(null);
@@ -138,7 +139,7 @@ const SummaryPage: React.FC = () => {
     };
     
     if (isLoading) {
-        return <div className="min-h-screen flex justify-center">Loading Rankings...</div>;
+        return <div className="min-h-screen flex justify-center">Loading view...</div>;
     }
     
     if (!ranking1) {
@@ -189,7 +190,7 @@ const SummaryPage: React.FC = () => {
                         </>
                     )}
                     {id2 && (
-                         <Link 
+                        <Link 
                             href={`/rankings/new`}
                             className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-600 transition inline-block"
                         >
@@ -202,4 +203,10 @@ const SummaryPage: React.FC = () => {
     );
 };
 
-export default SummaryPage;
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SummaryView />
+    </Suspense>
+  );
+}

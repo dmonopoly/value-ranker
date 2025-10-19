@@ -17,6 +17,7 @@ import TierDragOverlay from '@/components/TierDragOverlay';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import { TEMPLATES, TemplateKey } from '@/lib/ItemTemplates';
 import Ranking from "@/models/Ranking";
+import { Suspense } from 'react'
 
 // Internal state structure for quick JS manipulations before writing to models/Ranking.
 type ItemsState = {
@@ -38,7 +39,7 @@ const defaultInitialValues: ItemsState = {
     },
     tierOrder: [],
 };
-const RankingPage: React.FC = () => {
+const RankingView: React.FC = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     
@@ -436,6 +437,7 @@ const RankingPage: React.FC = () => {
     const isDraggingTier = activeDraggedId && activeDraggedId.startsWith('tier-');
 
     return (
+        <Suspense fallback={<div>Loading...</div>}>
         <div>
             <header className="text-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-700">
@@ -487,7 +489,14 @@ const RankingPage: React.FC = () => {
                 </button>
             </footer>
         </div>
+        </Suspense>
     );
 };
 
-export default RankingPage;
+export default function RankingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RankingView />
+    </Suspense>
+  );
+}
