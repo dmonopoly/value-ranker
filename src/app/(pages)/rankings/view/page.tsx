@@ -126,13 +126,27 @@ const SummaryView: React.FC = () => {
 
         // 2. Copy the link to the clipboard
         navigator.clipboard.writeText(quizLink).then(() => {
-            // 3. Show the confirmation popup
             setShowPopup(true);
         }).catch(err => {
             console.error('Failed to copy link: ', err);
             alert('Failed to copy link to clipboard.');
         });
     };
+
+    const handleGetSharedLink = () => {
+        const friendRankingId = ranking1?.otherBlobIds?.[0];
+        if (!friendRankingId) throw new Error("No friend ranking ID found even though we should have already generated a shared link; cannot reconstruct shared link")
+        if (!id1) throw new Error("id1 is null; cannot reconstruct shared link");
+
+        const quizLink = `${window.location.origin}/rankings/new?${ORIGIN_ID_PARAM}=${id1}&${TARGET_ID_PARAM}=${friendRankingId}`;
+        setShareableLink(quizLink);
+        navigator.clipboard.writeText(quizLink).then(() => {
+            setShowPopup(true);
+        }).catch(err => {
+            console.error('Failed to copy link: ', err);
+            alert('Failed to copy link to clipboard.');
+        });
+    }
 
     const handleViewSharedResults = () => {
         router.push(`/rankings/view?id1=${id1}&id2=${ranking1?.otherBlobIds?.[0]}`)
@@ -173,19 +187,29 @@ const SummaryView: React.FC = () => {
                             >
                                 Edit Your Ranking
                             </Link>
-                            <button 
-                                onClick={handleQuizFriend}
-                                className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
-                            >
-                                Ask Friend to Rank
-                            </button>
-                            { (ranking1.otherBlobIds?.length ?? 0) > 0 && (
+                            { (ranking1.otherBlobIds?.length ?? 0) === 0 && (
                                 <button 
-                                    onClick={handleViewSharedResults}
-                                    className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    onClick={handleQuizFriend}
+                                    className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
                                 >
-                                    View Shared Results
+                                    Ask Friend to Rank
                                 </button>
+                            )}
+                            { (ranking1.otherBlobIds?.length ?? 0) > 0 && (
+                                <>
+                                    <button 
+                                        onClick={handleGetSharedLink}
+                                        className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    >
+                                        Get Shared Link
+                                    </button>
+                                    <button 
+                                        onClick={handleViewSharedResults}
+                                        className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    >
+                                        View Shared Results
+                                    </button>
+                                </>
                             )}
                         </>
                     )}
