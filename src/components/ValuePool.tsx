@@ -10,7 +10,7 @@ type ValuePoolProps = {
     items: string[];
     pageType: ValuePoolPageType;
     onAddNewValue: (value: string) => void;
-    onChangeTemplate: (id: string) => void;
+    onChangeTemplate: (templateKey: string) => void;
     onDeleteItem: (id: string) => void;
 };
 
@@ -79,7 +79,6 @@ const ValuePool: React.FC<ValuePoolProps> = ({ items, pageType, onAddNewValue, o
                 >
                     {items.length === 0 && <div className="text-gray-500 pt-2 pl-2 pr-2 pb-2">No items to rank yet</div>}
                     {items.map(item =>
-                        // @ts-ignore
                         <ValueItem key={item} id={item} onDelete={onDeleteItem} />)}
                     {items.length > 0 && <div className="w-full text-center text-gray-400 pt-2 pl-2 pr-2 pb-2">Leave unranked items here</div>}
                 </div>

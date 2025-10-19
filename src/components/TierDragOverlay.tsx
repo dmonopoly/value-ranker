@@ -23,7 +23,6 @@ const TierDragOverlay: React.FC<TierDragOverlayProps> = ({ tierItems, rank }) =>
             </div>
             <div className="flex flex-wrap gap-2">
                 {tierItems.map(item => 
-                    // @ts-ignore
                     <SimpleValueItem key={item} id={item} />)}
             </div>
         </div>

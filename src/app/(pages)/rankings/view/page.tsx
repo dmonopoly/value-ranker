@@ -6,7 +6,7 @@ import Link from 'next/link';
 import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import Ranking from '@/models/Ranking';
-import randomstring from 'randomstring';
+import { Suspense } from 'react'
 
 const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | null }) => {
     if (!ranking) return <div>Loading {title}...</div>;
@@ -49,7 +49,7 @@ const RankingDisplay = ({ title, ranking }: { title: string, ranking: Ranking | 
     );
 };
 
-const SummaryPage: React.FC = () => {
+const SummaryView: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [ranking1, setRanking1] = useState<Ranking | null>(null);
@@ -106,7 +106,7 @@ const SummaryPage: React.FC = () => {
 
             // Update our own entry to include the new friend id.
             if (!ranking1) throw new Error("Current ranking data is missing.");
-            ranking1.otherBlobIds = [...(ranking1.otherBlobIds ?? []), friendRankingId];
+            ranking1.otherBlobIds = [friendRankingId];  // Overwrite any existing one for simplicity
             setRanking1(ranking1);
             response = await fetch(`/api/rankings/${id1}`, {
                 method: 'PUT',
@@ -126,7 +126,6 @@ const SummaryPage: React.FC = () => {
 
         // 2. Copy the link to the clipboard
         navigator.clipboard.writeText(quizLink).then(() => {
-            // 3. Show the confirmation popup
             setShowPopup(true);
         }).catch(err => {
             console.error('Failed to copy link: ', err);
@@ -134,12 +133,27 @@ const SummaryPage: React.FC = () => {
         });
     };
 
+    const handleGetSharedLink = () => {
+        const friendRankingId = ranking1?.otherBlobIds?.[0];
+        if (!friendRankingId) throw new Error("No friend ranking ID found even though we should have already generated a shared link; cannot reconstruct shared link")
+        if (!id1) throw new Error("id1 is null; cannot reconstruct shared link");
+
+        const quizLink = `${window.location.origin}/rankings/new?${ORIGIN_ID_PARAM}=${id1}&${TARGET_ID_PARAM}=${friendRankingId}`;
+        setShareableLink(quizLink);
+        navigator.clipboard.writeText(quizLink).then(() => {
+            setShowPopup(true);
+        }).catch(err => {
+            console.error('Failed to copy link: ', err);
+            alert('Failed to copy link to clipboard.');
+        });
+    }
+
     const handleViewSharedResults = () => {
         router.push(`/rankings/view?id1=${id1}&id2=${ranking1?.otherBlobIds?.[0]}`)
     };
     
     if (isLoading) {
-        return <div className="min-h-screen flex justify-center">Loading Rankings...</div>;
+        return <div className="min-h-screen flex justify-center">Loading view...</div>;
     }
     
     if (!ranking1) {
@@ -173,24 +187,34 @@ const SummaryPage: React.FC = () => {
                             >
                                 Edit Your Ranking
                             </Link>
-                            <button 
-                                onClick={handleQuizFriend}
-                                className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
-                            >
-                                Ask Friend to Rank
-                            </button>
-                            { ranking1.otherBlobIds?.length > 0 && (
+                            { (ranking1.otherBlobIds?.length ?? 0) === 0 && (
                                 <button 
-                                    onClick={handleViewSharedResults}
-                                    className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    onClick={handleQuizFriend}
+                                    className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
                                 >
-                                    View Shared Results
+                                    Ask Friend to Rank
                                 </button>
+                            )}
+                            { (ranking1.otherBlobIds?.length ?? 0) > 0 && (
+                                <>
+                                    <button 
+                                        onClick={handleGetSharedLink}
+                                        className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    >
+                                        Get Shared Link
+                                    </button>
+                                    <button 
+                                        onClick={handleViewSharedResults}
+                                        className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
+                                    >
+                                        View Shared Results
+                                    </button>
+                                </>
                             )}
                         </>
                     )}
                     {id2 && (
-                         <Link 
+                        <Link 
                             href={`/rankings/new`}
                             className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-600 transition inline-block"
                         >
@@ -203,4 +227,10 @@ const SummaryPage: React.FC = () => {
     );
 };
 
-export default SummaryPage;
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SummaryView />
+    </Suspense>
+  );
+}

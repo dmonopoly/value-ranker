@@ -38,8 +38,8 @@ const SharePopup: React.FC<SharePopupProps> = ({ shareableLink, onClose }) => {
     return (
         <div className="fixed inset-0 bg-gray-50/75 flex items-center justify-center z-50">
             <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm w-full">
-                <h3 className="text-xl font-bold mb-4">Link Ready!</h3>
-                <p className="text-gray-600 mb-4">Your ranking is saved. Share this link with a friend:</p>
+                <h3 className="text-xl font-bold mb-4 text-green-600">Link Copied!</h3>
+                <p className="text-gray-600 mb-4">Share this link with a friend:</p>
                 <div className="relative">
                         <input 
                             type="text"

@@ -13,7 +13,7 @@ type ValueItemProps = {
  * @param id - The unique identifier for the item.
  * @returns 
  */
-const ValueItem: React.FC<ValueItemProps> = ({ id, onDelete }) => {
+const ValueItem: React.FC<ValueItemProps> = ({ id }) => {
     const {
         attributes,
         listeners,
@@ -35,11 +35,11 @@ const ValueItem: React.FC<ValueItemProps> = ({ id, onDelete }) => {
         zIndex: isDragging ? 999 : 'auto',
     };
 
-    const handleDelete = (e: React.MouseEvent) => {
-        // Prevent the drag event from firing when clicking the delete button
-        e.stopPropagation(); 
-        onDelete?.(id);
-    };
+    // const handleDelete = (e: React.MouseEvent) => {
+    //     // Prevent the drag event from firing when clicking the delete button
+    //     e.stopPropagation(); 
+    //     onDelete?.(id);
+    // };
     
     return (
         <div 
