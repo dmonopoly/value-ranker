@@ -106,7 +106,7 @@ const SummaryView: React.FC = () => {
 
             // Update our own entry to include the new friend id.
             if (!ranking1) throw new Error("Current ranking data is missing.");
-            ranking1.otherBlobIds = [...(ranking1.otherBlobIds ?? []), friendRankingId];
+            ranking1.otherBlobIds = [friendRankingId];  // Overwrite any existing one for simplicity
             setRanking1(ranking1);
             response = await fetch(`/api/rankings/${id1}`, {
                 method: 'PUT',
