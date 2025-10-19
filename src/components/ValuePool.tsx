@@ -7,6 +7,7 @@ import { ValuePoolPageType } from '../lib/ValuePoolPageType';
 import ValueItem from './ValueItem';
 
 type ValuePoolProps = {
+    topic: string;
     items: string[];
     pageType: ValuePoolPageType;
     onAddNewValue: (value: string) => void;
@@ -17,31 +18,36 @@ type ValuePoolProps = {
 /**
  * The value pool is the "parking lot" where unranked values are stored.
  */
-const ValuePool: React.FC<ValuePoolProps> = ({ items, pageType, onAddNewValue, onChangeTemplate, onDeleteItem }) => {
+const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewValue, onChangeTemplate, onDeleteItem }) => {
     const { setNodeRef } = useDroppable({ id: 'parking-lot' });
     const [newValue, setNewValue] = useState('');
 
     const handleAddClick = () => {
         onAddNewValue(newValue);
-        setNewValue(''); // Clear the input after adding
+        setNewValue('');
     };
 
-    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             handleAddClick();
         }
     };
 
+    const handleTemplateSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        onChangeTemplate(event.target.value);
+        // setTopic(event.target.options[event.target.selectedIndex].text);
+    }
+
     return (
         <div className="flex flex-col">
-            <h2 className="font-bold text-center text-gray-600 mb-2">Items</h2>
+            <h2 className="font-bold text-center text-gray-600 mb-2">{topic}</h2>
             <div className="p-2">
                 <div className="flex flex-col sm:flex-row gap-2 mb-2">
                     <input 
                         type="text"
                         value={newValue}
                         onChange={(e) => setNewValue(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         placeholder="Add your own item..."
                         className="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
@@ -56,7 +62,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ items, pageType, onAddNewValue, o
                     <div className="mb-2">
                         <div className="inline-block text-sm text-gray-400 mb-2 mr-2">Or preload a template</div>
                         <select id="template-select"
-                            onChange={(e) => onChangeTemplate(e.target.value)}
+                            onChange={handleTemplateSelect}
                             className="inline-block p-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none h-full"
                             aria-label="Select a value template"
                         >
