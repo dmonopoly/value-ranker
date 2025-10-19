@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/services/mongodb';
+import clientPromise from '@/backend-services/mongodb';
 import { ObjectId } from 'mongodb'; // Required to query by MongoDB's unique _id
 
 /**
