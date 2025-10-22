@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project to easily share your ranked valu
 
 ## Getting Started
 
-Ensure you have a .env.local with local Mongo settings:
+Ensure you have a `.env.local` file with local Mongo settings:
 
 ```
 # Set up your own local mongo db

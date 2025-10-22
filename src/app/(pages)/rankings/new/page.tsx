@@ -91,7 +91,6 @@ const RankingView: React.FC = () => {
                     });
                     newContainers['parking-lot'] = data.unrankedItems || [];
                     setItems({
-                        topic: data.topic,
                         tierOrder: newTierOrder,
                         containers: newContainers,
                         // Fields other than tierOrder and containers are the same
