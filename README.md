@@ -5,7 +5,8 @@ This is a [Next.js](https://nextjs.org) project to easily share your ranked valu
 Ensure you have a .env.local with local Mongo settings:
 
 ```
-MONGODB_URI=GET_VALUE_FROM_MONGO
+# Set up your own local mongo db
+MONGODB_URI="mongodb+srv://<YOUR_MONGO_USERNAME>:<YOUR_MONGO_PASSWORD>@<YOUR_CLUSTER_NAME>.???.mongodb.net/"
 MONGODB_DATABASE="value_ranker"
 MONGODB_RANKINGS_COLLECTION="rankings"
 ```
