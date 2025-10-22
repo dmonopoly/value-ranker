@@ -10,7 +10,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const { id } = await context.params;
     try {
         const client = await clientPromise;
-        const db = client.db(process.env.MONGO_DATABASE);
+        const db = client.db(process.env.MONGODB_DATABASE);
 
         // Validate the incoming ID to ensure it's a valid MongoDB ObjectId.
         if (!ObjectId.isValid(id)) {
@@ -19,7 +19,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
         // Find the single document in the database that matches the ID.
         const ranking = await db
-            .collection(process.env.MONGO_RANKINGS_COLLECTION!)
+            .collection(process.env.MONGODB_RANKINGS_COLLECTION!)
             .findOne({ _id: new ObjectId(id) });
 
         if (!ranking) {
@@ -41,11 +41,8 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
     const { id } = await context.params;
     try {
-        console.log("Updating ranking 1");
         const client = await clientPromise;
-        console.log("Updating ranking 2");
-        const db = client.db(process.env.MONGO_DATABASE);
-        console.log("Updating ranking 3");
+        const db = client.db(process.env.MONGODB_DATABASE);
 
         console.log("Updating ranking with ID:", id);
 
@@ -66,7 +63,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         // Find the document by ID and update it with the new data.
         // The `$set` operator replaces the values of the fields with the specified values.
         const result = await db
-            .collection(process.env.MONGO_RANKINGS_COLLECTION!)
+            .collection(process.env.MONGODB_RANKINGS_COLLECTION!)
             .updateOne({ _id: new ObjectId(id) }, { $set: updatedData });
 
         console.log("result:", result);

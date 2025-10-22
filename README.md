@@ -2,7 +2,15 @@ This is a [Next.js](https://nextjs.org) project to easily share your ranked valu
 
 ## Getting Started
 
-First, run the development server:
+Ensure you have a .env.local with local Mongo settings:
+
+```
+MONGODB_URI=GET_VALUE_FROM_MONGO
+MONGODB_DATABASE="value_ranker"
+MONGODB_RANKINGS_COLLECTION="rankings"
+```
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -14,4 +22,3 @@ npm run dev
 - /ranking/edit and /ranking/new should reuse components instead of /edit importing /new's page component entirely (hack)
 
 ## Deployed on Vercel
-
