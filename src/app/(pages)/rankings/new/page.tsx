@@ -21,6 +21,7 @@ import { Suspense } from 'react'
 
 // Internal state structure for quick JS manipulations before writing to models/Ranking.
 type ItemsState = {
+    topic: string;
     // Stores key "parking-lot" for unranked items and "tier-<id>" for ranked tiers
     // where <id> is a unique number
     containers: {
@@ -34,6 +35,7 @@ type ItemsState = {
 const DEFAULT_CREATE_TEMPLATE: TemplateKey = 'blank';
 
 const defaultInitialValues: ItemsState = {
+    topic: 'Anything',
     containers: {
         "parking-lot": [...TEMPLATES[DEFAULT_CREATE_TEMPLATE]],
     },
@@ -88,7 +90,9 @@ const RankingView: React.FC = () => {
                         newContainers[tierId] = tierItems;
                     });
                     newContainers['parking-lot'] = data.unrankedItems || [];
-                    setItems({ tierOrder: newTierOrder, containers: newContainers,
+                    setItems({
+                        tierOrder: newTierOrder,
+                        containers: newContainers,
                         // Fields other than tierOrder and containers are the same
                         ...data });
                 }
@@ -118,6 +122,7 @@ const RankingView: React.FC = () => {
                     const allItems = data.rankedTiers.flat().concat(data.unrankedItems || []);
                     setItems({
                         // No ...prev intentionally
+                        topic: data.topic,
                         tierOrder: [],
                         containers: {
                             'parking-lot': allItems
@@ -361,6 +366,7 @@ const RankingView: React.FC = () => {
             const unrankedItems = items.containers['parking-lot'] || [];
 
             const dataToSave = {
+                title: items.topic,
                 rankedTiers: rankedTiersAsArray,
                 unrankedItems,
                 otherBlobIds: items.otherBlobIds || [], // Ensure this is initialized
@@ -457,7 +463,9 @@ const RankingView: React.FC = () => {
                 onDragEnd={handleDragEnd}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <ValuePool items={items.containers["parking-lot"] || []}
+                    <ValuePool
+                        topic={items.topic}
+                        items={items.containers["parking-lot"] || []}
                         pageType={originRankingId? 'invited' : editRankingId ? 'edit' : 'create'}
                         onAddNewValue={addNewValue}
                         onChangeTemplate={handleChangeTemplate}

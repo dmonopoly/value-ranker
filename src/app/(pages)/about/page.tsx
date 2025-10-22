@@ -16,8 +16,8 @@ const AboutPage: React.FC = () => {
                     </div>
                 </section>
 
-                <section className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 className="text-2xl font-bold text-center">
+                <section className="p-6">
+                    <h2 className="text-2xl text-blue-600 font-bold text-center">
                         Features
                     </h2>
                 </section>
