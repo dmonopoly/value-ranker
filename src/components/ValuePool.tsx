@@ -43,7 +43,6 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
     }
 
     function getSelectClassName() {
-        console.log('topic', topic);
         return `${shouldDisableTopicSelect() ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white'} inline-block p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-full`;
     }
 

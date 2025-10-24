@@ -88,7 +88,7 @@ const RankingView: React.FC = () => {
                     newContainers['parking-lot'] = data.unrankedItems || [];
                     console.log('loading edit with ', data);
                     setItems({
-                        ...data,
+                        ...data,  // Keep otherBlobIds, auto-get future fields
                         topic: data.topic || DEFAULT_CREATE_TEMPLATE,
                         tierOrder: newTierOrder,
                         containers: newContainers,
@@ -362,8 +362,8 @@ const RankingView: React.FC = () => {
             const rankedTiersAsArray = items.tierOrder.map(tierId => items.containers[tierId]);
             const unrankedItems = items.containers['parking-lot'] || [];
 
-            const dataToSave = {
-                title: items.topic,
+            const dataToSave: Ranking = {
+                topic: items.topic,
                 rankedTiers: rankedTiersAsArray,
                 unrankedItems,
                 otherBlobIds: items.otherBlobIds || [], // Ensure this is initialized
@@ -391,7 +391,6 @@ const RankingView: React.FC = () => {
 
                     // The friend's ranking should link back to the person who invited them.
                     dataToSave.otherBlobIds = [originRankingId];
-                    console.log('dataToSave:', dataToSave);
 
                     response = await fetch(`/api/rankings/${targetRankingId}`, {
                         method: 'PUT',
@@ -407,7 +406,7 @@ const RankingView: React.FC = () => {
 
                     router.push(`/rankings/view?id1=${targetRankingId}&id2=${originRankingId}`);
                 } else {
-                    // Creating a new ranking.
+                    // Create a new ranking.
                     response = await fetch('/api/rankings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
