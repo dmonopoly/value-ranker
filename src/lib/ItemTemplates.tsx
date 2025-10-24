@@ -24,25 +24,25 @@ export const TEMPLATES = {
         'German',
         'Spanish',
     ],
-    'detailed_values': [
-        'Parents',
-        'Siblings',
-        'Significant Other',
-        'Friends',
-        'Spirituality',
-        'Health',
-        'Learning',
-        'Fun',
-        'Career',
-        'Honesty',
-        'Compassion',
-        'Discipline',
-        'Creativity',
-        'Integrity',
-        'Kindness',
-        'Perseverance',
-        'Growth',
-    ],
+    // 'detailed_values': [
+    //     'Parents',
+    //     'Siblings',
+    //     'Significant Other',
+    //     'Friends',
+    //     'Spirituality',
+    //     'Health',
+    //     'Learning',
+    //     'Fun',
+    //     'Career',
+    //     'Honesty',
+    //     'Compassion',
+    //     'Discipline',
+    //     'Creativity',
+    //     'Integrity',
+    //     'Kindness',
+    //     'Perseverance',
+    //     'Growth',
+    // ],
     'funny_situations': [
         'Accidentally sending a text to the wrong person',
         'Mooching off your parents even though you\'re an adult',
@@ -70,3 +70,13 @@ export const TEMPLATES = {
 };
 
 export type TemplateKey = keyof typeof TEMPLATES;
+
+export const TEMPLATE_DISPLAY_NAMES: Record<TemplateKey, string> = {
+    'blank': 'Anything',
+    'basic_values': 'Core Values',
+    'cuisines': 'Cuisines',
+    // 'detailed_values': 'Detailed Values',
+    'funny_situations': 'Funny Situations',
+    'love_languages': 'Love Languages',
+    'romantic_gestures': 'Romantic Gestures',
+};
