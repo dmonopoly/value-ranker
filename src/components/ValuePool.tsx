@@ -8,7 +8,7 @@ import { TEMPLATE_DISPLAY_NAMES, TemplateKey } from '../lib/ItemTemplates';
 import ValueItem from './ValueItem';
 
 type ValuePoolProps = {
-    topic: string;
+    topic: TemplateKey;
     items: string[];
     pageType: ValuePoolPageType;
     onAddNewValue: (value: string) => void;
@@ -36,7 +36,6 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
 
     const handleTemplateSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         onChangeTemplate(event.target.value as TemplateKey);
-        // setTopic(event.target.options[event.target.selectedIndex].text);
     }
 
     function shouldDisableTopicSelect() {
@@ -44,6 +43,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
     }
 
     function getSelectClassName() {
+        console.log('topic', topic);
         return `${shouldDisableTopicSelect() ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white'} inline-block p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-full`;
     }
 
@@ -54,6 +54,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                     <div className="mb-2">
                         <div className="inline-block text-lg font-bold mb-2 mr-2">Topic:</div>
                         <select id="template-select"
+                            value={topic}
                             onChange={handleTemplateSelect}
                             disabled={shouldDisableTopicSelect()}
                             className={getSelectClassName()}
