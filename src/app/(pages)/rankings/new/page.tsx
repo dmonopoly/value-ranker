@@ -21,7 +21,7 @@ import { Suspense } from 'react'
 
 // Internal state structure for quick JS manipulations before writing to models/Ranking.
 type ItemsState = {
-    topic: string;
+    topic: TemplateKey;
     // Stores key "parking-lot" for unranked items and "tier-<id>" for ranked tiers
     // where <id> is a unique number
     containers: {
@@ -35,7 +35,7 @@ type ItemsState = {
 const DEFAULT_CREATE_TEMPLATE: TemplateKey = 'blank';
 
 const defaultInitialValues: ItemsState = {
-    topic: 'Anything',
+    topic: DEFAULT_CREATE_TEMPLATE,
     containers: {
         "parking-lot": [...TEMPLATES[DEFAULT_CREATE_TEMPLATE]],
     },
@@ -46,10 +46,6 @@ const RankingView: React.FC = () => {
     const router = useRouter();
     
     const [items, setItems] = useState<ItemsState>(defaultInitialValues);
-
-    // The default must match the first option in the dropdown in ValuePool.
-    const [activeTemplate, setActiveTemplate] = useState<TemplateKey>(DEFAULT_CREATE_TEMPLATE);
-
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [activeDraggedId, setActiveDraggedId] = useState<string | null>(null);
@@ -90,11 +86,13 @@ const RankingView: React.FC = () => {
                         newContainers[tierId] = tierItems;
                     });
                     newContainers['parking-lot'] = data.unrankedItems || [];
+                    console.log('loading edit with ', data);
                     setItems({
+                        ...data,  // Keep otherBlobIds, auto-get future fields
+                        topic: data.topic || DEFAULT_CREATE_TEMPLATE,
                         tierOrder: newTierOrder,
                         containers: newContainers,
-                        // Fields other than tierOrder and containers are the same
-                        ...data });
+                    });
                 }
             } catch (error) {
                 if (isComponentMounted) {
@@ -121,7 +119,7 @@ const RankingView: React.FC = () => {
                     // Use the friend's ranked items as the initial unranked items
                     const allItems = data.rankedTiers.flat().concat(data.unrankedItems || []);
                     setItems({
-                        // No ...prev intentionally
+                        // No ...prev: Do not want origin friend's otherBlobIds, which is yourself
                         topic: data.topic,
                         tierOrder: [],
                         containers: {
@@ -145,7 +143,6 @@ const RankingView: React.FC = () => {
         } else if (originRankingId) {
             loadValuesFromOriginFriend(originRankingId);
         } else {
-            setItems(defaultInitialValues);
             setIsLoading(false);
         }
     
@@ -187,7 +184,7 @@ const RankingView: React.FC = () => {
         const hasRankedItems = items.tierOrder.length > 0;
 
         const currentParkingLot = items.containers['parking-lot'] || [];
-        const templateParkingLot = TEMPLATES[activeTemplate];
+        const templateParkingLot = TEMPLATES[items.topic];
         const currentSet = new Set(currentParkingLot);
         const templateSet = new Set(templateParkingLot);
         const customItemsInParkingLot = currentSet.size !== templateSet.size || 
@@ -199,19 +196,19 @@ const RankingView: React.FC = () => {
             );
             if (!userIsSure) {
                 // If user cancels, reset the dropdown to show the current active template
-                updateTemplateSelectDropdown(activeTemplate);
+                updateTemplateSelectDropdown(items.topic);
                 return; 
             }
         }
         
-        const template = templateKey as TemplateKey;
-        setActiveTemplate(template);
+        const newTemplate = templateKey as TemplateKey;
         setItems((prev) => ({
             ...prev,
-            tierOrder: [],
+            topic: newTemplate,
             containers: {
-                'parking-lot': TEMPLATES[template].sort(() => 0.5 - Math.random()),
+                'parking-lot': TEMPLATES[newTemplate].sort(() => 0.5 - Math.random()),
             },
+            tierOrder: [],
         }));
     };
 
@@ -365,8 +362,8 @@ const RankingView: React.FC = () => {
             const rankedTiersAsArray = items.tierOrder.map(tierId => items.containers[tierId]);
             const unrankedItems = items.containers['parking-lot'] || [];
 
-            const dataToSave = {
-                title: items.topic,
+            const dataToSave: Ranking = {
+                topic: items.topic,
                 rankedTiers: rankedTiersAsArray,
                 unrankedItems,
                 otherBlobIds: items.otherBlobIds || [], // Ensure this is initialized
@@ -394,7 +391,6 @@ const RankingView: React.FC = () => {
 
                     // The friend's ranking should link back to the person who invited them.
                     dataToSave.otherBlobIds = [originRankingId];
-                    console.log('dataToSave:', dataToSave);
 
                     response = await fetch(`/api/rankings/${targetRankingId}`, {
                         method: 'PUT',
@@ -410,7 +406,7 @@ const RankingView: React.FC = () => {
 
                     router.push(`/rankings/view?id1=${targetRankingId}&id2=${originRankingId}`);
                 } else {
-                    // Creating a new ranking.
+                    // Create a new ranking.
                     response = await fetch('/api/rankings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
