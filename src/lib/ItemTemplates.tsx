@@ -69,9 +69,11 @@ export const TEMPLATES = {
     ],
 };
 
-export type TemplateKey = keyof typeof TEMPLATES;
+// Support both predefined templates and custom string values
+export type PredefinedTemplateKey = keyof typeof TEMPLATES;
+export type TemplateKey = PredefinedTemplateKey | string;
 
-export const TEMPLATE_DISPLAY_NAMES: Record<TemplateKey, string> = {
+export const TEMPLATE_DISPLAY_NAMES: Record<PredefinedTemplateKey, string> = {
     'blank': 'Anything',
     'basic_values': 'Core Values',
     'cuisines': 'Cuisines',
@@ -80,3 +82,21 @@ export const TEMPLATE_DISPLAY_NAMES: Record<TemplateKey, string> = {
     'love_languages': 'Love Languages',
     'romantic_gestures': 'Romantic Gestures',
 };
+
+export function isPredefinedTemplate(topic: TemplateKey): topic is PredefinedTemplateKey {
+    return topic in TEMPLATES;
+}
+
+export function getTemplateItems(topic: TemplateKey): string[] {
+    if (isPredefinedTemplate(topic)) {
+        return TEMPLATES[topic];
+    }
+    return []; // Custom topics start with no items
+}
+
+export function getTopicDisplayName(topic: TemplateKey): string {
+    if (isPredefinedTemplate(topic)) {
+        return TEMPLATE_DISPLAY_NAMES[topic];
+    }
+    return topic; // For custom topics, use the topic string directly
+}

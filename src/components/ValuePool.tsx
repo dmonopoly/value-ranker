@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { ValuePoolPageType } from '../lib/ValuePoolPageType';
-import { TEMPLATE_DISPLAY_NAMES, TemplateKey } from '../lib/ItemTemplates';
+import { TEMPLATE_DISPLAY_NAMES, TemplateKey, PredefinedTemplateKey, getTopicDisplayName } from '../lib/ItemTemplates';
 import ValueItem from './ValueItem';
 
 type ValuePoolProps = {
@@ -34,9 +34,37 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
         }
     };
 
-    const handleTemplateSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        onChangeTemplate(event.target.value as TemplateKey);
-    }
+    const [isEditingTopic, setIsEditingTopic] = useState(false);
+    const [customTopicInput, setCustomTopicInput] = useState('');
+
+    const handleTemplateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCustomTopicInput(event.target.value);
+    };
+
+    const handleTemplateInputBlur = () => {
+        const value = customTopicInput.trim();
+        if (value && value !== topic) {
+            onChangeTemplate(value);
+        }
+        setIsEditingTopic(false);
+        setCustomTopicInput('');
+    };
+
+    const handleTemplateInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleTemplateInputBlur();
+        } else if (event.key === 'Escape') {
+            setIsEditingTopic(false);
+            setCustomTopicInput('');
+        }
+    };
+
+    const handleTopicClick = () => {
+        if (!shouldDisableTopicSelect()) {
+            setIsEditingTopic(true);
+            setCustomTopicInput(topic);
+        }
+    };
 
     function shouldDisableTopicSelect() {
         return pageType === 'edit' || pageType === 'invited';
@@ -52,19 +80,39 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                 {(
                     <div className="mb-2">
                         <div className="inline-block text-lg font-bold mb-2 mr-2">Topic:</div>
-                        <select id="template-select"
-                            value={topic}
-                            onChange={handleTemplateSelect}
-                            disabled={shouldDisableTopicSelect()}
-                            className={getSelectClassName()}
-                            aria-label="Select a value template"
-                        >
-                            {(Object.keys(TEMPLATE_DISPLAY_NAMES) as TemplateKey[]).map((key) => (
-                                <option key={key} value={key}>
-                                    {TEMPLATE_DISPLAY_NAMES[key]}
-                                </option>
-                            ))}
-                        </select>
+                        {isEditingTopic ? (
+                            <>
+                                <input
+                                    id="template-select"
+                                    type="text"
+                                    list="template-options"
+                                    value={customTopicInput}
+                                    onChange={handleTemplateInputChange}
+                                    onBlur={handleTemplateInputBlur}
+                                    onKeyDown={handleTemplateInputKeyDown}
+                                    autoFocus
+                                    className="inline-block p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-full"
+                                    aria-label="Enter a custom topic or select from templates"
+                                    placeholder="Enter custom topic or select..."
+                                />
+                                <datalist id="template-options">
+                                    {(Object.keys(TEMPLATE_DISPLAY_NAMES) as PredefinedTemplateKey[]).map((key) => (
+                                        <option key={key} value={key}>
+                                            {TEMPLATE_DISPLAY_NAMES[key]}
+                                        </option>
+                                    ))}
+                                </datalist>
+                            </>
+                        ) : (
+                            <span
+                                id="template-select"
+                                onClick={handleTopicClick}
+                                className={`${shouldDisableTopicSelect() ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-gray-50'} inline-block p-2 border rounded-lg h-full`}
+                                aria-label="Current topic"
+                            >
+                                {getTopicDisplayName(topic)}
+                            </span>
+                        )}
                     </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-2 mb-2">
