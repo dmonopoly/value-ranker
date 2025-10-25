@@ -44,7 +44,11 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
     const handleTemplateInputBlur = () => {
         const value = customTopicInput.trim();
         if (value && value !== topic) {
-            onChangeTemplate(value);
+            // Check if the value matches a display name and map it back to the key
+            const displayNameEntries = Object.entries(TEMPLATE_DISPLAY_NAMES) as Array<[PredefinedTemplateKey, string]>;
+            const matchingKey = displayNameEntries.find(([_key, displayName]) => displayName === value)?.[0];
+            const topicToUse = matchingKey || value;
+            onChangeTemplate(topicToUse);
         }
         setIsEditingTopic(false);
         setCustomTopicInput('');
@@ -62,7 +66,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
     const handleTopicClick = () => {
         if (!shouldDisableTopicSelect()) {
             setIsEditingTopic(true);
-            setCustomTopicInput(topic);
+            setCustomTopicInput(getTopicDisplayName(topic));
         }
     };
 
@@ -93,9 +97,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                                 />
                                 <datalist id="template-options">
                                     {(Object.keys(TEMPLATE_DISPLAY_NAMES) as PredefinedTemplateKey[]).map((key) => (
-                                        <option key={key} value={key}>
-                                            {TEMPLATE_DISPLAY_NAMES[key]}
-                                        </option>
+                                        <option key={key} value={TEMPLATE_DISPLAY_NAMES[key]} />
                                     ))}
                                 </datalist>
                             </>

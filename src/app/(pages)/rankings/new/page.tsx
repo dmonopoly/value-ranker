@@ -173,13 +173,6 @@ const RankingView: React.FC = () => {
         return Object.keys(items.containers).find((key) => items.containers[key].includes(id as string));
     }
 
-    function updateTemplateSelectDropdown(val: string){
-        const dropdown = document.getElementById('template-select') as HTMLSelectElement;
-        if (dropdown) {
-            dropdown.value = val;
-        }
-    }
-
     const handleChangeTemplate = (templateKey: string) => {
         const hasRankedItems = items.tierOrder.length > 0;
 
@@ -196,7 +189,6 @@ const RankingView: React.FC = () => {
             );
             if (!userIsSure) {
                 // If user cancels, reset the dropdown to show the current active template
-                // updateTemplateSelectDropdown(items.topic);
                 return; 
             }
         }
