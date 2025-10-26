@@ -139,10 +139,13 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                             <span
                                 id="template-select"
                                 onClick={handleTopicClick}
-                                className={`${shouldDisableTopicSelect() ? 'bg-gray-100 text-gray-800 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-gray-50'} inline-block p-2 border rounded-lg h-full`}
+                                className={`${shouldDisableTopicSelect() ? 'text-gray-800 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-gray-50'} inline-block p-2 border rounded-lg h-full`}
                                 aria-label="Current topic"
                             >
                                 {getTopicDisplayName(topic)}
+                                {!shouldDisableTopicSelect() && (
+                                    <span className="ml-1 text-xs text-gray-600">▼</span>
+                                )}
                             </span>
                         )}
                     </div>
