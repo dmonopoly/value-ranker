@@ -36,22 +36,40 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
 
     const [isEditingTopic, setIsEditingTopic] = useState(false);
     const [customTopicInput, setCustomTopicInput] = useState('');
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const handleTemplateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCustomTopicInput(event.target.value);
+        setShowDropdown(true);
     };
 
     const handleTemplateInputBlur = () => {
-        const value = customTopicInput.trim();
-        if (value && value !== topic) {
-            // Check if the value matches a display name and map it back to the key
-            const displayNameEntries = Object.entries(TEMPLATE_DISPLAY_NAMES) as Array<[PredefinedTemplateKey, string]>;
-            const matchingKey = displayNameEntries.find(([_key, displayName]) => displayName === value)?.[0];
-            const topicToUse = matchingKey || value;
-            onChangeTemplate(topicToUse);
+        // Delay to allow click on dropdown options (handleSelectOption)
+        setTimeout(() => {
+            const value = customTopicInput.trim();
+            if (value && value !== topic) {
+                // Check if the value matches a display name and map it back to the key
+                const displayNameEntries = Object.entries(TEMPLATE_DISPLAY_NAMES) as Array<[PredefinedTemplateKey, string]>;
+                const matchingKey = displayNameEntries.find(([_key, displayName]) => displayName === value)?.[0];
+                const topicToUse = matchingKey || value;
+                onChangeTemplate(topicToUse);
+            }
+            setIsEditingTopic(false);
+            setCustomTopicInput('');
+            setShowDropdown(false);
+        }, 200);
+    };
+
+    const handleSelectOption = (displayName: string) => {
+        setCustomTopicInput(displayName);
+        const displayNameEntries = Object.entries(TEMPLATE_DISPLAY_NAMES) as Array<[PredefinedTemplateKey, string]>;
+        const matchingKey = displayNameEntries.find(([_key, name]) => name === displayName)?.[0];
+        if (matchingKey) {
+            onChangeTemplate(matchingKey);
         }
         setIsEditingTopic(false);
         setCustomTopicInput('');
+        setShowDropdown(false);
     };
 
     const handleTemplateInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -67,6 +85,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
         if (!shouldDisableTopicSelect()) {
             setIsEditingTopic(true);
             setCustomTopicInput(getTopicDisplayName(topic));
+            setShowDropdown(true);
         }
     };
 
@@ -81,26 +100,40 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                     <div className="mb-2">
                         <div className="inline-block text-lg font-bold mb-2 mr-2">Topic:</div>
                         {isEditingTopic ? (
-                            <>
+                            <div className="relative inline-block">
                                 <input
                                     id="template-select"
                                     type="text"
-                                    list="template-options"
                                     value={customTopicInput}
                                     onChange={handleTemplateInputChange}
+                                    onFocus={() => setShowDropdown(true)}
                                     onBlur={handleTemplateInputBlur}
                                     onKeyDown={handleTemplateInputKeyDown}
                                     autoFocus
-                                    className="inline-block p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-full"
+                                    className="inline-block p-2 pr-8 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none h-full min-w-[250px]"
                                     aria-label="Enter a custom topic or select from templates"
                                     placeholder="Enter custom topic or select..."
                                 />
-                                <datalist id="template-options">
-                                    {(Object.keys(TEMPLATE_DISPLAY_NAMES) as PredefinedTemplateKey[]).map((key) => (
-                                        <option key={key} value={TEMPLATE_DISPLAY_NAMES[key]} />
-                                    ))}
-                                </datalist>
-                            </>
+                                {showDropdown && (
+                                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {(Object.keys(TEMPLATE_DISPLAY_NAMES) as PredefinedTemplateKey[])
+                                            .map((key) => TEMPLATE_DISPLAY_NAMES[key])
+                                            .filter((name) => name.toLowerCase().includes(customTopicInput.toLowerCase()))
+                                            .map((displayName) => (
+                                                <div
+                                                    key={displayName}
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault();
+                                                        handleSelectOption(displayName);
+                                                    }}
+                                                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-800"
+                                                >
+                                                    {displayName}
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <span
                                 id="template-select"
