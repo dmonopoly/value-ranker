@@ -118,7 +118,8 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
                                     <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {(Object.keys(TEMPLATE_DISPLAY_NAMES) as PredefinedTemplateKey[])
                                             .map((key) => TEMPLATE_DISPLAY_NAMES[key])
-                                            .filter((name) => name.toLowerCase().includes(customTopicInput.toLowerCase()))
+                                            .sort((a, b) => a.localeCompare(b))
+                                            // .filter((name) => name.toLowerCase().includes(customTopicInput.toLowerCase()))
                                             .map((displayName) => (
                                                 <div
                                                     key={displayName}
