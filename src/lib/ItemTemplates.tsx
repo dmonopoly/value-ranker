@@ -65,7 +65,7 @@ export const TEMPLATES = {
         'Compliments, Love Letter',
         'Weekend Getaway',
         'Candlelight Dinner',
-        'Massage/Spa Day',
+        'Massage/Spa',
     ],
     'movies': [
         'Action',
@@ -120,12 +120,6 @@ export const TEMPLATES = {
         'Cat',
         'Bird',
         'Fish',
-        'Rabbit',
-        'Hamster',
-        'Guinea Pig',
-        'Reptile',
-        'Horse',
-        'Ferret',
     ],
     'seasons': [
         'Spring',
