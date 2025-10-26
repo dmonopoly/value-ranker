@@ -15,7 +15,7 @@ import RankingBoard from '@/components/RankingBoard';
 import ValueItem from '@/components/ValueItem';
 import TierDragOverlay from '@/components/TierDragOverlay';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
-import { TEMPLATES, TemplateKey } from '@/lib/ItemTemplates';
+import { TemplateKey, getTemplateItems } from '@/lib/ItemTemplates';
 import Ranking from "@/models/Ranking";
 import { Suspense } from 'react'
 
@@ -32,12 +32,12 @@ type ItemsState = {
     otherBlobIds?: string[];
 };
 
-const DEFAULT_CREATE_TEMPLATE: TemplateKey = 'blank';
+const DEFAULT_CREATE_TEMPLATE: TemplateKey = 'cuisines';
 
 const defaultInitialValues: ItemsState = {
     topic: DEFAULT_CREATE_TEMPLATE,
     containers: {
-        "parking-lot": [...TEMPLATES[DEFAULT_CREATE_TEMPLATE]],
+        "parking-lot": [...getTemplateItems(DEFAULT_CREATE_TEMPLATE)],
     },
     tierOrder: [],
 };
@@ -173,18 +173,11 @@ const RankingView: React.FC = () => {
         return Object.keys(items.containers).find((key) => items.containers[key].includes(id as string));
     }
 
-    function updateTemplateSelectDropdown(val: string){
-        const dropdown = document.getElementById('template-select') as HTMLSelectElement;
-        if (dropdown) {
-            dropdown.value = val;
-        }
-    }
-
     const handleChangeTemplate = (templateKey: string) => {
         const hasRankedItems = items.tierOrder.length > 0;
 
         const currentParkingLot = items.containers['parking-lot'] || [];
-        const templateParkingLot = TEMPLATES[items.topic];
+        const templateParkingLot = getTemplateItems(items.topic);
         const currentSet = new Set(currentParkingLot);
         const templateSet = new Set(templateParkingLot);
         const customItemsInParkingLot = currentSet.size !== templateSet.size || 
@@ -196,7 +189,6 @@ const RankingView: React.FC = () => {
             );
             if (!userIsSure) {
                 // If user cancels, reset the dropdown to show the current active template
-                updateTemplateSelectDropdown(items.topic);
                 return; 
             }
         }
@@ -206,7 +198,7 @@ const RankingView: React.FC = () => {
             ...prev,
             topic: newTemplate,
             containers: {
-                'parking-lot': TEMPLATES[newTemplate].sort(() => 0.5 - Math.random()),
+                'parking-lot': getTemplateItems(newTemplate).sort(() => 0.5 - Math.random()),
             },
             tierOrder: [],
         }));
@@ -449,7 +441,7 @@ const RankingView: React.FC = () => {
                     {
                         originRankingId ?
                             "Someone wants to get to know you better. Rank these items and compare with them!"
-                            : "Add your own items, rank, and invite someone else to get to know them better!"
+                            : "Choose a topic or make your own, rank, and compare with a friend!"
                     }
                 </p>
             </header>
