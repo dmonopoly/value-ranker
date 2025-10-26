@@ -168,14 +168,14 @@ const SummaryView: React.FC = () => {
             <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-3xl mx-auto">
                 <header className="text-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">
-                        {ranking1.topic ? "Topic: " + getTopicDisplayName(ranking1.topic) : "Results"}
+                        {ranking1.topic ? getTopicDisplayName(ranking1.topic) : "Results"}
                     </h1>
                 </header>
 
                 {/* Main Content Area */}
                 <div className={ranking2 ? "grid grid-cols-1 md:grid-cols-2 gap-8" : "grid grid-cols-1 justify-items-center"}>
                     <RankingDisplay title="You" ranking={ranking1} />
-                    {ranking2 ? <RankingDisplay title="Friend" ranking={ranking2} /> : ""}
+                    {ranking2 ? <RankingDisplay title="Them" ranking={ranking2} /> : ""}
                 </div>
                 
                 {/* Action Buttons */}

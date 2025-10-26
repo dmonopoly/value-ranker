@@ -441,7 +441,7 @@ const RankingView: React.FC = () => {
                     {
                         originRankingId ?
                             "Someone wants to get to know you better. Rank these items and compare with them!"
-                            : "Choose a topic or make your own, rank, and share!"
+                            : "Choose a topic or make your own, rank, and compare with a friend!"
                     }
                 </p>
             </header>
