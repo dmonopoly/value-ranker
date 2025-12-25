@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import SharePopup from '@/components/SharePopup';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
+import { updateRankingWithConfirmation } from '@/lib/rankingApi';
 import Ranking from '@/models/Ranking';
 import { Suspense } from 'react'
 import { getTopicDisplayName } from '@/lib/ItemTemplates';
@@ -104,16 +105,16 @@ const SummaryView: React.FC = () => {
             const responseData = await response.json();
             friendRankingId = responseData.insertedId;
 
-
             // Update our own entry to include the new friend id.
             if (!ranking1) throw new Error("Current ranking data is missing.");
             ranking1.otherBlobIds = [friendRankingId];  // Overwrite any existing one for simplicity
             setRanking1(ranking1);
-            response = await fetch(`/api/rankings/${id1}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ranking1),
-            });
+            
+            // Skip confirmation since we're only updating metadata, not ranks.
+            let updateOwnEntryResponse = await updateRankingWithConfirmation(id1, ranking1, { skipConfirmation: true });
+            if (!updateOwnEntryResponse || !updateOwnEntryResponse.ok) {
+                throw new Error(`Failed to update own entry with metadata pointing to new entry for other friend to fill out. Response: ${updateOwnEntryResponse}`);
+            }
         } catch (error) {
             console.error(`Failed to prepare new ranking for friend:`, error);
             return null;

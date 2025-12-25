@@ -16,6 +16,7 @@ import ValueItem from '@/components/ValueItem';
 import TierDragOverlay from '@/components/TierDragOverlay';
 import { ORIGIN_ID_PARAM, TARGET_ID_PARAM } from '@/lib/ParamConstants';
 import { TemplateKey, getTemplateItems } from '@/lib/ItemTemplates';
+import { updateRankingWithConfirmation } from '@/lib/rankingApi';
 import Ranking from "@/models/Ranking";
 import { Suspense } from 'react'
 
@@ -361,15 +362,17 @@ const RankingView: React.FC = () => {
                 otherBlobIds: items.otherBlobIds || [], // Ensure this is initialized
             };
 
-            let response: Response;
+            let response: Response | null;
             if (editRankingId) {
                 // Editing an existing ranking.
                 console.log('Editing ranking with items: ', items);
-                response = await fetch(`/api/rankings/${editRankingId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataToSave),
-                });
+                response = await updateRankingWithConfirmation(editRankingId, dataToSave);
+
+                if (response === null) {
+                    // User cancelled the overwrite confirmation
+                    setIsSaving(false);
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error(`Failed to update ranking. Status: ${response.status}`);
@@ -384,11 +387,13 @@ const RankingView: React.FC = () => {
                     // The friend's ranking should link back to the person who invited them.
                     dataToSave.otherBlobIds = [originRankingId];
 
-                    response = await fetch(`/api/rankings/${targetRankingId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dataToSave),
-                    });
+                    response = await updateRankingWithConfirmation(targetRankingId, dataToSave);
+
+                    if (response === null) {
+                        // User cancelled the overwrite confirmation
+                        setIsSaving(false);
+                        return;
+                    }
 
                     if (!response.ok) {
                         const errorMsg = 'Friend failed to update ranking';
