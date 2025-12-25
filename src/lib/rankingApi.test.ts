@@ -7,6 +7,7 @@ global.fetch = mockFetch as unknown as typeof fetch;
 
 // Mock window.confirm (create window global for Node environment)
 const mockConfirm = vi.fn();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).window = { confirm: mockConfirm };
 
 describe('updateRankingWithConfirmation', () => {

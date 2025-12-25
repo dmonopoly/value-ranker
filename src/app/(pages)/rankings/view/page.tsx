@@ -95,7 +95,7 @@ const SummaryView: React.FC = () => {
         let friendRankingId: string;
         try {
             // Create other entry that friend will fill out.
-            let response = await fetch('/api/rankings', {
+            const response = await fetch('/api/rankings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({}),
@@ -111,7 +111,7 @@ const SummaryView: React.FC = () => {
             setRanking1(ranking1);
             
             // Skip confirmation since we're only updating metadata, not ranks.
-            let updateOwnEntryResponse = await updateRankingWithConfirmation(id1, ranking1, { skipConfirmation: true });
+            const updateOwnEntryResponse = await updateRankingWithConfirmation(id1, ranking1, { skipConfirmation: true });
             if (!updateOwnEntryResponse || !updateOwnEntryResponse.ok) {
                 throw new Error(`Failed to update own entry with metadata pointing to new entry for other friend to fill out. Response: ${updateOwnEntryResponse}`);
             }
