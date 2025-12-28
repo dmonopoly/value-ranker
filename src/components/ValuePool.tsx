@@ -98,7 +98,7 @@ const ValuePool: React.FC<ValuePoolProps> = ({ topic, items, pageType, onAddNewV
             <div className="p-2">
                 {(
                     <div className="mb-2">
-                        <div className="inline-block text-lg font-bold mb-2 mr-2">Topic:</div>
+                        <div className="inline-block text-lg font-bold mb-2 mr-2">Write your own topic:</div>
                         {isEditingTopic ? (
                             <div className="relative inline-block">
                                 <input
